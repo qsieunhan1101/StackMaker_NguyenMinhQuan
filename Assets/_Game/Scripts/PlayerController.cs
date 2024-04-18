@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     private float angle = 0;
     private float sign = 1;
     private float offset = 1;
+    [SerializeField] private float heightBrickMesh = 0.3f;
     [SerializeField] private bool isMoving = false;
 
     private Vector3 rayOriginPos;
@@ -30,6 +31,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform brickParentTranform;
     [SerializeField] private List<GameObject> listBrick;
 
+
+    public delegate void ChestDelegate();
+    public static ChestDelegate ChestEvent;
+
+
+    private bool isRay = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,8 +46,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        MoveSetUpDirection();
+
         Move();
-        transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
 
         if (currentDirect != Direct.None)
         {
@@ -54,14 +62,19 @@ public class PlayerController : MonoBehaviour
         {
             currentDirect = Direct.None;
         }
-
         BrickController();
     }
 
 
     private void Move()
     {
+        transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+    }
+
+    private void MoveSetUpDirection()
+    {
         GetRayOriginPos();
+
         Ray ray = new Ray(transform.position + rayOriginPos + Vector3.up, Vector3.down);
         RaycastHit hit;
         Debug.DrawRay(transform.position + rayOriginPos + Vector3.up, Vector3.down * 10, Color.red);
@@ -72,13 +85,24 @@ public class PlayerController : MonoBehaviour
                 target = hit.collider.transform.position;
                 target.y = target.y + 0.5f;
             }
+            if (hit.collider.CompareTag("Finish"))
+            {
 
+                ChestEvent?.Invoke();
+
+                ClearBrick();
+            }
         }
+
+
+
     }
+
     private void BrickController()
     {
-        Ray rayy = new Ray(transform.position + Vector3.up, Vector3.down);
+        Ray rayy = new Ray(transform.position + Vector3.up + -rayOriginPos * 0.5f, Vector3.down);
         RaycastHit hit;
+        Debug.DrawRay(transform.position + Vector3.up + -rayOriginPos * 0.5f, Vector3.down*30, Color.blue);
         if (Physics.Raycast(rayy, out hit))
         {
             if (hit.collider.CompareTag("Brick"))
@@ -104,8 +128,8 @@ public class PlayerController : MonoBehaviour
             GameObject newBrick = Instantiate(prefabBrickMesh, brickParentTranform);
             listBrick.Add(newBrick);
             newBrick.name = $"Brick {listBrick.Count - 1}";
-            newBrick.transform.position = new Vector3(brickParentTranform.position.x, ((int)listBrick.Count - 1) * 0.46f, brickParentTranform.position.z);
-            playerAnimPos.transform.position = new Vector3(playerAnimPos.transform.position.x, (int)listBrick.Count * 0.46f, playerAnimPos.transform.position.z);
+            newBrick.transform.position = new Vector3(brickParentTranform.position.x, ((int)listBrick.Count - 1) * heightBrickMesh - 0.4f, brickParentTranform.position.z);
+            playerAnimPos.transform.position = new Vector3(playerAnimPos.transform.position.x, (int)listBrick.Count * heightBrickMesh - 0.4f, playerAnimPos.transform.position.z);
         }
     }
     private void RemoveBrick()
@@ -115,11 +139,16 @@ public class PlayerController : MonoBehaviour
             Destroy(listBrick[listBrick.Count - 1]);
             listBrick.RemoveAt(listBrick.Count - 1);
         }
-        playerAnimPos.transform.position = new Vector3(playerAnimPos.transform.position.x, (int)listBrick.Count * 0.46f, playerAnimPos.transform.position.z);
+        playerAnimPos.transform.position = new Vector3(playerAnimPos.transform.position.x, (int)listBrick.Count * heightBrickMesh, playerAnimPos.transform.position.z);
     }
     private void ClearBrick()
     {
+        foreach (GameObject brick in listBrick)
+        {
+            Destroy(brick);
+        }
         listBrick.Clear();
+        playerAnimPos.transform.position = new Vector3(playerAnimPos.transform.position.x, (int)listBrick.Count * heightBrickMesh, playerAnimPos.transform.position.z);
     }
     private void SetAmim()
     {
@@ -213,4 +242,16 @@ public class PlayerController : MonoBehaviour
            Gizmos.DrawLine(transform.position + new Vector3(1,0,0), cube.transform.position);
        }*/
 
+    private void Push()
+    {
+
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            Push();
+        }
+    }
 }
