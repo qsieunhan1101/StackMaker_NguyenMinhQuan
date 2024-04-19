@@ -3,18 +3,6 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private Vector2 startPos;
-    private Vector2 endPos;
-    private float angle = 0;
-    private float sign = 1;
-    private float offset = 1;
-    [SerializeField] private float heightBrickMesh = 0.3f;
-    [SerializeField] private bool isMoving = false;
-
-    private Vector3 rayOriginPos;
-
-    [SerializeField] private float speed = 5f;
-    [SerializeField] Vector3 target;
     private enum Direct
     {
         Right,
@@ -23,6 +11,19 @@ public class PlayerController : MonoBehaviour
         Backward,
         None,
     }
+    private Vector2 startPos;
+    private Vector2 endPos;
+    private float angle = 0;
+    private float sign = 1;
+    private float offset = 1;
+
+    [SerializeField] private float heightBrickMesh = 0.3f;
+    [SerializeField] private bool isMoving = false;
+
+    private Vector3 rayOriginPos;
+
+    [SerializeField] private float speed = 5f;
+    [SerializeField] Vector3 target;
     [SerializeField] private Direct currentDirect = Direct.None;
     //
 
@@ -32,11 +33,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private List<GameObject> listBrick;
 
 
-    public delegate void ChestDelegate();
-    public static ChestDelegate ChestEvent;
+    public delegate void FinishDelegate();
+    public static FinishDelegate finishEvent;
 
 
-    private bool isRay = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -88,8 +88,7 @@ public class PlayerController : MonoBehaviour
             if (hit.collider.CompareTag("Finish"))
             {
 
-                ChestEvent?.Invoke();
-
+                finishEvent?.Invoke();
                 ClearBrick();
             }
         }

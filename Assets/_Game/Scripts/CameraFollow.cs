@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
     [SerializeField] private Vector3 offset;
-    [SerializeField] private Transform target;
+    [SerializeField] public GameObject target;
     [SerializeField] private float smoothTime;
     private Vector3 current = Vector3.zero;
     public float distanceFormTager = 10f;
@@ -13,18 +11,36 @@ public class CameraFollow : MonoBehaviour
 
     private void Start()
     {
-        Vector3 newPosition = target.position - target.forward * distanceFormTager;
-        newPosition.y = target.position.y + heightAboveTager;
-        transform.position = newPosition;
-        offset = transform.position - target.position;
+
     }
 
     // Update is called once per frame
     private void LateUpdate()
     {
-        Vector3 targetPosition = target.position + offset;
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref current, smoothTime);
+        if (target != null)
+        {
+            Vector3 targetPosition = target.transform.position + offset;
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref current, smoothTime);
 
-        transform.LookAt(target);
+            transform.LookAt(target.transform);
+
+        }
+    }
+    private void OnEnable()
+    {
+        LevelManager.loadLevelEvent += SetUpCamera;
+    }
+    private void OnDisable()
+    {
+        LevelManager.loadLevelEvent -= SetUpCamera;
+
+    }
+
+    private void SetUpCamera()
+    {
+        Vector3 newPosition = target.transform.position - target.transform.forward * distanceFormTager;
+        newPosition.y = target.transform.position.y + heightAboveTager;
+        transform.position = newPosition;
+        offset = transform.position - target.transform.position;
     }
 }

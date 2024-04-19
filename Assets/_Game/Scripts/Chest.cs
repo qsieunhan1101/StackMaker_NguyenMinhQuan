@@ -19,11 +19,11 @@ public class Chest : MonoBehaviour
     }
     private void OnEnable()
     {
-        PlayerController.ChestEvent += OpenChest;
+        PlayerController.finishEvent += OpenChest;
     }
     private void OnDisable()
     {
-        PlayerController.ChestEvent -= OpenChest;
+        PlayerController.finishEvent -= OpenChest;
     }
     public void OpenChest() 
     {
