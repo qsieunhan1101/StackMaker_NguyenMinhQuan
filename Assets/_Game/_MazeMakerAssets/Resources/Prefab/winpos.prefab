@@ -22615,6 +22615,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chestOpen: {fileID: 1502762753808250}
   chestClose: {fileID: 1095323009806971}
+  leftParticle: {fileID: 198723746604263940}
+  rightParticle: {fileID: 198957174810120253}
 --- !u!1 &1382597685722805
 GameObject:
   m_ObjectHideFlags: 0

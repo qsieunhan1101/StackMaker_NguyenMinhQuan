@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Vector3 target;
     [SerializeField] private Direct currentDirect = Direct.None;
     //
+    [SerializeField] private bool isFinish = false;
 
     [SerializeField] private GameObject prefabBrickMesh;
     [SerializeField] private GameObject playerAnimPos;
@@ -74,26 +75,26 @@ public class PlayerController : MonoBehaviour
     private void MoveSetUpDirection()
     {
         GetRayOriginPos();
-
-        Ray ray = new Ray(transform.position + rayOriginPos + Vector3.up, Vector3.down);
-        RaycastHit hit;
-        Debug.DrawRay(transform.position + rayOriginPos + Vector3.up, Vector3.down * 10, Color.red);
-        if (Physics.Raycast(ray, out hit))
+        if (isFinish == false)
         {
-            if (hit.collider.CompareTag("Brick") || hit.collider.CompareTag("UnBrick") || hit.collider.CompareTag("HiddenBrick"))
+            Ray ray = new Ray(transform.position + rayOriginPos + Vector3.up, Vector3.down);
+            RaycastHit hit;
+            Debug.DrawRay(transform.position + rayOriginPos + Vector3.up, Vector3.down * 10, Color.red);
+            if (Physics.Raycast(ray, out hit))
             {
-                target = hit.collider.transform.position;
-                target.y = target.y + 0.5f;
-            }
-            if (hit.collider.CompareTag("Finish"))
-            {
-
-                finishEvent?.Invoke();
-                ClearBrick();
+                if (hit.collider.CompareTag("Brick") || hit.collider.CompareTag("UnBrick") || hit.collider.CompareTag("HiddenBrick"))
+                {
+                    target = hit.collider.transform.position;
+                    target.y = target.y + 0.5f;
+                }
+                if (hit.collider.CompareTag("Finish"))
+                {
+                    ClearBrick();
+                    isFinish = true;
+                    finishEvent?.Invoke();
+                }
             }
         }
-
-
 
     }
 
@@ -101,7 +102,7 @@ public class PlayerController : MonoBehaviour
     {
         Ray rayy = new Ray(transform.position + Vector3.up + -rayOriginPos * 0.5f, Vector3.down);
         RaycastHit hit;
-        Debug.DrawRay(transform.position + Vector3.up + -rayOriginPos * 0.5f, Vector3.down*30, Color.blue);
+        Debug.DrawRay(transform.position + Vector3.up + -rayOriginPos * 0.5f, Vector3.down * 30, Color.blue);
         if (Physics.Raycast(rayy, out hit))
         {
             if (hit.collider.CompareTag("Brick"))
@@ -115,8 +116,8 @@ public class PlayerController : MonoBehaviour
             {
                 RemoveBrick();
                 hit.collider.gameObject.tag = "HiddenBrick";
-                GameObject gg = hit.collider.transform.GetChild(0).gameObject;
-                gg.SetActive(true);
+                GameObject lineColor = hit.collider.transform.GetChild(0).gameObject;
+                lineColor.SetActive(true);
             }
         }
     }

@@ -6,6 +6,9 @@ public class Chest : MonoBehaviour
 {
     [SerializeField] private GameObject chestOpen;
     [SerializeField] private GameObject chestClose;
+
+    [SerializeField] private ParticleSystem leftParticle;
+    [SerializeField] private ParticleSystem rightParticle;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,5 +32,7 @@ public class Chest : MonoBehaviour
     {
         chestClose.GetComponent<MeshRenderer>().enabled = false;
         chestOpen.SetActive(true);
+        leftParticle.Play();
+        rightParticle.Play();
     }
 }
